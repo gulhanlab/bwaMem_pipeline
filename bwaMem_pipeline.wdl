@@ -132,7 +132,7 @@ task samtoolsSort {
     }
 
     output {
-        File sorted_bam = ${prefix}_DNA_sorted.bam
+        File sorted_bam = '${prefix}_DNA_sorted.bam'
     }
 
     runtime {
