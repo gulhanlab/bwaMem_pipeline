@@ -54,6 +54,14 @@ workflow bwaMem_pipeline {
             bam_file = samtoolsSort.sorted_bam
     }
 
+    output {
+        File aligned_bam = bwaMem.output_bam
+        File sorted_bam = samtoolsSort.sorted_bam
+        File sorted_bam_idx = samtoolsIndex.sorted_bam_idx
+        File genome_results = bamQC.genome_results
+        File html_report = bamQC.html_report
+        File pdf_report = bamQC.pdf_report
+    }
 }
 
 # TASK DEFINITIONS #########################################
