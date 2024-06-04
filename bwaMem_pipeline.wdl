@@ -6,7 +6,7 @@ workflow bwaMem_pipeline {
         File fastq1
         File fastq2
         File reference_genome_fa
-        # Non-optional for now
+        # Optional
         File? reference_genome_amb
         File? reference_genome_ann
         File? reference_genome_bwt
@@ -55,7 +55,7 @@ workflow bwaMem_pipeline {
     }
 
     output {
-        File aligned_bam = bwaMem.output_bam
+        #File aligned_bam = bwaMem.output_bam (remove; not needed, can just keep sorted_bam)
         File sorted_bam = samtoolsSort.sorted_bam
         File sorted_bam_idx = samtoolsIndex.sorted_bam_idx
         File genome_results = bamQC.genome_results
