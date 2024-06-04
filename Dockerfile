@@ -26,4 +26,5 @@ ENV PATH="/opt/qualimap_v2.3:$PATH"
 CMD ["bash"]
 
 LABEL maintainer="Garrett Lam"
+LABEL version="1.0"
 LABEL description="Docker image for bwaMem pipeline"

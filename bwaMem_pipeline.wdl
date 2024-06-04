@@ -83,7 +83,7 @@ task bwaIndex {
     }
 
     runtime {
-        docker: "biocontainers/bwa:v0.7.17_cv1"
+        docker: 'gulhanlab/bwa-mem_pipeline:v1'
     }
 }
 
@@ -116,7 +116,7 @@ task bwaMem {
     }
 
     runtime {
-        docker: "biocontainers/bwa:v0.7.17_cv1"
+        docker: 'gulhanlab/bwa-mem_pipeline:v1'
         memory: "${memory} GB"
         disks: "local-disk ${disk_space} HDD"
         cpu: "${num_threads}"
@@ -145,7 +145,7 @@ task samtoolsSort {
     }
 
     runtime {
-        docker: "biocontainers/samtools:v1.9-4-deb_cv1"
+        docker: 'gulhanlab/bwa-mem_pipeline:v1'
         memory: "${memory} GB"
         disks: "local-disk ${disk_space} HDD"
         cpu: "${num_threads}"
@@ -174,7 +174,7 @@ task samtoolsIndex {
     }
 
     runtime {
-        docker: "biocontainers/samtools:v1.9-4-deb_cv1"
+        docker: 'gulhanlab/bwa-mem_pipeline:v1'
         memory: "${memory} GB"
         disks: "local-disk ${disk_space} HDD"
         cpu: "${num_threads}"
@@ -205,7 +205,7 @@ task bamQC {
     }
 
     runtime {
-        docker: "pegi3s/qualimap:2.2.1"
+        docker: 'gulhanlab/bwa-mem_pipeline:v1'
         memory: "${memory} GB"
         disks: "local-disk ${disk_space} HDD"
         cpu: "${num_threads}"
