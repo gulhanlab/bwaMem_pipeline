@@ -51,7 +51,7 @@ workflow bwaMem_pipeline {
     call bamQC {
         input:
             prefix = prefix,
-            bam_file = samtoolsIndex.sorted_bam
+            bam_file = samtoolsSort.sorted_bam
     }
 
 }
