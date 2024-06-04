@@ -7,50 +7,50 @@ workflow bwaMem_pipeline {
         File fastq2
         File reference_genome_fa
         # Non-optional for now
-        File reference_genome_amb
-        File reference_genome_ann
-        File reference_genome_bwt
-        File reference_genome_pac
-        File reference_genome_sa
+        File? reference_genome_amb
+        File? reference_genome_ann
+        File? reference_genome_bwt
+        File? reference_genome_pac
+        File? reference_genome_sa
     }
 
-    # # If BWA index files not provided, generate them
-    # if (!defined(reference_genome_amb) && !defined(reference_genome_ann) && !defined(reference_genome_bwt) &&
-    # !defined(reference_genome_pac) && !defined(reference_genome_sa)){
-    #     call bwaIndex {
-    #         input:
-    #             reference_genome_fa=reference_genome_fa
-    #     }
-    # }
+    # If BWA index files not provided, generate them
+    if (!defined(reference_genome_amb) && !defined(reference_genome_ann) && !defined(reference_genome_bwt) &&
+    !defined(reference_genome_pac) && !defined(reference_genome_sa)){
+        call bwaIndex {
+            input:
+                reference_genome_fa=reference_genome_fa
+        }
+    }
 
     call bwaMem {
-        input: 
-            prefix = prefix
-            fastq1 = fastq1
-            fastq2 = fastq2
-            reference_genome_fa = reference_genome_fa
-            reference_genome_amb = select_first([reference_genome_amb, bwaIndex.bwa_index_amb])
-            reference_genome_ann = select_first([reference_genome_ann, bwaIndex.bwa_index_ann])
-            reference_genome_bwt = select_first([reference_genome_bwt, bwaIndex.bwa_index_bwt])
-            reference_genome_pac = select_first([reference_genome_pac, bwaIndex.bwa_index_pac])
+        input:
+            prefix = prefix,
+            fastq1 = fastq1,
+            fastq2 = fastq2,
+            reference_genome_fa = reference_genome_fa,
+            reference_genome_amb = select_first([reference_genome_amb, bwaIndex.bwa_index_amb]),
+            reference_genome_ann = select_first([reference_genome_ann, bwaIndex.bwa_index_ann]),
+            reference_genome_bwt = select_first([reference_genome_bwt, bwaIndex.bwa_index_bwt]),
+            reference_genome_pac = select_first([reference_genome_pac, bwaIndex.bwa_index_pac]),
             reference_genome_sa = select_first([reference_genome_sa, bwaIndex.bwa_index_sa])
     }
 
     call samtoolsSort {
         input:
-            prefix = prefix
+            prefix = prefix,
             unsorted_bam = bwaMem.output_bam
     }
 
     call samtoolsIndex {
         input:
-            prefix = prefix
+            prefix = prefix,
             sorted_bam = samtoolsSort.sorted_bam
     }
 
     call bamQC {
         input:
-            prefix = prefix
+            prefix = prefix,
             bam_file = samtoolsIndex.sorted_bam
     }
 
