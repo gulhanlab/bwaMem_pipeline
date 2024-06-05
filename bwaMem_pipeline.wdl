@@ -137,7 +137,7 @@ task samtoolsSort {
     }
 
     command {
-        samtools sort ${unsorted_bam} -o ${prefix}_DNA_sorted.bam -@ ${num_threads} 
+        samtools sort -o ${prefix}_DNA_sorted.bam -@ ${num_threads} ${unsorted_bam} 
     }
 
     output {
@@ -166,7 +166,7 @@ task samtoolsIndex {
     }
 
     command {
-        samtools index ${sorted_bam} -o ${prefix}_DNA_sorted.bam.bai -@ ${num_threads}
+        samtools index -b -@ ${num_threads} -o ${prefix}_DNA_sorted.bam.bai ${sorted_bam}
     }
 
     output {
