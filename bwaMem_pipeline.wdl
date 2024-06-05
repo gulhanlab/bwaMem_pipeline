@@ -137,7 +137,7 @@ task samtoolsSort {
     }
 
     command {
-        samtools sort -o ${prefix}_DNA_sorted.bam -@ ${num_threads} ${unsorted_bam} 
+        samtools sort -m 2G -@ ${num_threads} -o ${prefix}_DNA_sorted.bam  ${unsorted_bam} 
     }
 
     output {
@@ -195,7 +195,7 @@ task bamQC {
     }
 
     command {
-        qualimap bamqc -bam ${bam_file} -outdir ${prefix}_DNA_qualimap_report -nt ${num_threads}
+        qualimap bamqc -bam ${bam_file} -outdir ${prefix}_DNA_qualimap_report -nt ${num_threads} --java-mem-size={memory}G
     }
 
     output {
