@@ -3,6 +3,6 @@ workflows:
   - subclass: WDL
     primaryDescriptorPath: /bwaMem_pipeline.wdl
 
-  authors:
-    - name: Garrett Lam
-      email: glam@broadinstitute.org
+    authors:
+      - name: Garrett Lam
+        email: glam@broadinstitute.org
