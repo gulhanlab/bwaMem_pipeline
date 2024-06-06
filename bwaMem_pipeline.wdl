@@ -191,7 +191,7 @@ task bamQC {
         File bam_file
 
         # Configurable
-        Float memory
+        Int memory # java-mem-size must be int
         Int disk_space
         Int num_threads
         Int num_preempt
