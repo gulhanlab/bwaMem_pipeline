@@ -55,12 +55,10 @@ workflow bwaMem_pipeline {
     }
 
     output {
-        #File aligned_bam = bwaMem.output_bam (remove; not needed, can just keep sorted_bam)
         File sorted_bam = samtoolsSort.sorted_bam
         File sorted_bam_idx = samtoolsIndex.sorted_bam_idx
         File genome_results = bamQC.genome_results
         File html_report = bamQC.html_report
-        File pdf_report = bamQC.pdf_report
     }
 }
 
@@ -204,7 +202,6 @@ task bamQC {
     output {
         File genome_results = '${prefix}_DNA_qualimap_report/genome_results.txt'
         File html_report = '${prefix}_DNA_qualimap_report/qualimapReport.html'
-        File pdf_report = '${prefix}_DNA_qualimap_report/qualimapReport.pdf'
     }
 
     runtime {
