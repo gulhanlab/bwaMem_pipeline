@@ -137,7 +137,7 @@ task samtoolsSort {
     }
     
     # For -m flag
-    Int mem_per_thread = floor(memory / num_threads)
+    Int mem_per_thread = floor(memory/(num_threads+1))
 
     command {
         samtools sort -m ${mem_per_thread}G -@ ${num_threads} -o ${prefix}_DNA_sorted.bam ${unsorted_bam} 
