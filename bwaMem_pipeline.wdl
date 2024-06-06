@@ -133,11 +133,11 @@ task samtoolsSort {
         Float memory
         Int disk_space
         Int num_threads
-        Int num_preempt
-
-        # For -m flag
-        Int mem_per_thread = floor(memory / num_threads)
+        Int num_preempt   
     }
+    
+    # For -m flag
+    Int mem_per_thread = floor(memory / num_threads)
 
     command {
         samtools sort -m ${mem_per_thread}G -@ ${num_threads} -o ${prefix}_DNA_sorted.bam ${unsorted_bam} 
