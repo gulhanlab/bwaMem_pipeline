@@ -203,8 +203,8 @@ task bamQC {
 
     output {
         File genome_results = '${prefix}_DNA_qualimap_report/genome_results.txt'
-        File html_report = '${prefix}_qualimap_report/qualimapReport.html'
-        File pdf_report = '${prefix}_qualimap_report/qualimapReport.pdf'
+        File html_report = '${prefix}_DNA_qualimap_report/qualimapReport.html'
+        File pdf_report = '${prefix}_DNA_qualimap_report/qualimapReport.pdf'
     }
 
     runtime {
