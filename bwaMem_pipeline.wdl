@@ -140,7 +140,7 @@ task addOrReplaceReadGroups {
     }
 
     command {
-        java -jar picard.jar AddOrReplaceReadGroups \
+        java -jar /usr/picard/picard.jar AddOrReplaceReadGroups \
             I=${sorted_bam} \
             O=${prefix}_DNA_sorted_rg.bam \
             RGID=1 \
