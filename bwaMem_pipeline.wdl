@@ -106,7 +106,7 @@ task bwaMem {
     }
 
     # For -m flag for samtools sort
-    Int mem_per_thread = floor(memory/(num_threads+1))
+    Int mem_per_thread = floor(memory/(num_threads*2))
 
     command {
         bwa mem ${reference_genome_fa} ${fastq1} ${fastq2} -t ${num_threads} | \
