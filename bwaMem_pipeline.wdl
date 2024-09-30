@@ -126,7 +126,7 @@ task bwaMem {
     }
 }
 
-# Required for picard tools, such as MuTect2
+# Required for picard tools
 task addOrReplaceReadGroups {
     input {
         String prefix
@@ -176,11 +176,11 @@ task samtoolsIndex {
     }
 
     command {
-        samtools index -@ ${num_threads} -o ${prefix}_DNA_sorted_rg.bam.bai ${sorted_rg_bam}
+        samtools index -@ ${num_threads} ${sorted_rg_bam}
     }
 
     output {
-        File sorted_rg_bam_idx = '${prefix}_DNA_sorted_rg.bam.bai'
+        File sorted_rg_bam_idx = '${sorted_rg_bam}.bai'
     }
 
     runtime {
