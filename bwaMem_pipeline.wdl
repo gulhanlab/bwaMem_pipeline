@@ -56,7 +56,7 @@ workflow bwaMem_pipeline {
 
     output {
         File sorted_rg_bam = addOrReplaceReadGroups.sorted_rg_bam
-        File sorted_rg_bam_idx = samtoolsIndex.sorted_rg_bam_idx
+        File sorted_rg_bam_idx = addOrReplaceReadGroups.sorted_rg_bam_idx
         File genome_results = bamQC.genome_results
         File html_report = bamQC.html_report
     }
