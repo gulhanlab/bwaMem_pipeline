@@ -42,11 +42,11 @@ workflow bwaMem_pipeline {
             sorted_bam = bwaMem.sorted_bam
     }
 
-    call samtoolsIndex {
-        input:
-            prefix = prefix,
-            sorted_rg_bam = addOrReplaceReadGroups.sorted_rg_bam
-    }
+    # call samtoolsIndex {
+    #     input:
+    #         prefix = prefix,
+    #         sorted_rg_bam = addOrReplaceReadGroups.sorted_rg_bam
+    # }
 
     call bamQC {
         input:
@@ -69,15 +69,15 @@ task bwaIndex {
     }
 
     command {
-        bwa index ${reference_genome_fa}
+        bwa index ~{reference_genome_fa}
     }
 
     output {
-        File bwa_index_amb = '${reference_genome_fa}.amb'
-        File bwa_index_ann = '${reference_genome_fa}.ann'
-        File bwa_index_bwt = '${reference_genome_fa}.bwt'
-        File bwa_index_pac = '${reference_genome_fa}.pac'
-        File bwa_index_sa = '${reference_genome_fa}.sa'
+        File bwa_index_amb = '~{reference_genome_fa}.amb'
+        File bwa_index_ann = '~{reference_genome_fa}.ann'
+        File bwa_index_bwt = '~{reference_genome_fa}.bwt'
+        File bwa_index_pac = '~{reference_genome_fa}.pac'
+        File bwa_index_sa = '~{reference_genome_fa}.sa'
     }
 
     runtime {
@@ -109,24 +109,24 @@ task bwaMem {
     Int mem_per_thread = floor(memory/(num_threads*2))
 
     command {
-        bwa mem ${reference_genome_fa} ${fastq1} ${fastq2} -t ${num_threads} | \
-        samtools sort -m ${mem_per_thread}G -@ ${num_threads} -o ${prefix}_DNA_sorted.bam -
+        bwa mem ~{reference_genome_fa} ~{fastq1} ~{fastq2} -t ~{num_threads} | \
+        samtools sort -m ~{mem_per_thread}G -@ ~{num_threads} -o ~{prefix}_DNA_sorted.bam -
     }
     
     output {
-        File sorted_bam = '${prefix}_DNA_sorted.bam'
+        File sorted_bam = '~{prefix}_DNA_sorted.bam'
     }
 
     runtime {
         docker: 'gulhanlab/bwa_samtools:1.0'
-        memory: "${memory} GB"
-        disks: "local-disk ${disk_space} HDD"
-        cpu: "${num_threads}"
-        preemptible: "${num_preempt}"
+        memory: "~{memory} GB"
+        disks: "local-disk ~{disk_space} HDD"
+        cpu: "~{num_threads}"
+        preemptible: "~{num_preempt}"
     }
 }
 
-# Required for picard tools
+# Required for picard tools, generates bam index
 task addOrReplaceReadGroups {
     input {
         String prefix
@@ -141,56 +141,61 @@ task addOrReplaceReadGroups {
 
     command {
         java -jar /usr/picard/picard.jar AddOrReplaceReadGroups \
-            I=${sorted_bam} \
-            O=${prefix}_DNA_sorted_rg.bam \
+            I=~{sorted_bam} \
+            O=~{prefix}_DNA_sorted_rg.bam \
             RGID=1 \
             RGLB=lib_name \
             RGPL=ILLUMINA \
             RGPU=platform_unit \
-            RGSM=${prefix}
+            RGSM=~{prefix} \
+            CREATE_INDEX=true
     }
 
     output {
-        File sorted_rg_bam = '${prefix}_DNA_sorted_rg.bam'
+        File sorted_rg_bam = '~{prefix}_DNA_sorted_rg.bam'
+        File sorted_rg_bam_idx = '~{prefix}_DNA_sorted_rg.bam.bai'
     }
 
     runtime {
         docker: 'broadinstitute/picard:3.1.1'
-        memory: "${memory} GB"
-        disks: "local-disk ${disk_space} HDD"
-        cpu: "${num_threads}"
-        preemptible: "${num_preempt}"
+        memory: "~{memory} GB"
+        disks: "local-disk ~{disk_space} HDD"
+        cpu: "~{num_threads}"
+        preemptible: "~{num_preempt}"
     }
 }
 
-task samtoolsIndex {
-    input {
-        String prefix
-        File sorted_rg_bam
+# task samtoolsIndex {
+#     input {
+#         String prefix
+#         File sorted_rg_bam
 
-        # Configurable
-        Float memory
-        Int disk_space
-        Int num_threads
-        Int num_preempt
-    }
+#         # Configurable
+#         Float memory
+#         Int disk_space
+#         Int num_threads
+#         Int num_preempt
+#     }
 
-    command {
-        samtools index -@ ${num_threads} ${sorted_rg_bam}
-    }
+#     command {
+#         samtools index -@ ~{num_threads} -o ~{prefix}_DNA_sorted_rg.bam.bai ~{sorted_rg_bam}
+#     }
 
-    output {
-        File sorted_rg_bam_idx = '${sorted_rg_bam}.bai'
-    }
+#     #samtools index -@ ~{num_threads} ~{sorted_rg_bam}
 
-    runtime {
-        docker: 'staphb/samtools:1.20'
-        memory: "${memory} GB"
-        disks: "local-disk ${disk_space} HDD"
-        cpu: "${num_threads}"
-        preemptible: "${num_preempt}"
-    }
-}
+#     output {
+#         #File sorted_rg_bam_idx = '~{sorted_rg_bam}.bai'
+#         File sorted_rg_bam_idx = '~{prefix}_DNA_sorted_rg.bam.bai'
+#     }
+
+#     runtime {
+#         docker: 'staphb/samtools:1.20'
+#         memory: "~{memory} GB"
+#         disks: "local-disk ~{disk_space} HDD"
+#         cpu: "~{num_threads}"
+#         preemptible: "~{num_preempt}"
+#     }
+# }
 
 task bamQC {
     input {
@@ -205,19 +210,23 @@ task bamQC {
     }
 
     command {
-        qualimap bamqc -bam ${bam_file} -outdir ${prefix}_DNA_qualimap_report -nt ${num_threads} --java-mem-size=${memory}G
+        qualimap bamqc \
+            -bam ~{bam_file} \
+            -outdir ~{prefix}_DNA_qualimap_report \
+            -nt ~{num_threads} \
+            --java-mem-size=~{memory}G
     }
 
     output {
-        File genome_results = '${prefix}_DNA_qualimap_report/genome_results.txt'
-        File html_report = '${prefix}_DNA_qualimap_report/qualimapReport.html'
+        File genome_results = '~{prefix}_DNA_qualimap_report/genome_results.txt'
+        File html_report = '~{prefix}_DNA_qualimap_report/qualimapReport.html'
     }
 
     runtime {
         docker: 'pegi3s/qualimap:2.2.1'
-        memory: "${memory} GB"
-        disks: "local-disk ${disk_space} HDD"
-        cpu: "${num_threads}"
-        preemptible: "${num_preempt}"
+        memory: "~{memory} GB"
+        disks: "local-disk ~{disk_space} HDD"
+        cpu: "~{num_threads}"
+        preemptible: "~{num_preempt}"
     }
 }
