@@ -81,7 +81,7 @@ task bwaIndex {
     }
 
     runtime {
-        docker: 'pegi3s/bwa:latest'
+        docker: 'gulhanlab/bwa_align:1.0'
     }
 }
 
@@ -118,7 +118,7 @@ task bwaMem {
     }
 
     runtime {
-        docker: 'gulhanlab/bwa_samtools:1.0'
+        docker: 'gulhanlab/bwa_align:1.0'
         memory: "~{memory} GB"
         disks: "local-disk ~{disk_space} HDD"
         cpu: "~{num_threads}"
@@ -126,7 +126,7 @@ task bwaMem {
     }
 }
 
-# Required for picard tools, generates bam index
+# Required for picard tools, samtools generates bam index
 task addOrReplaceReadGroups {
     input {
         String prefix
@@ -140,15 +140,22 @@ task addOrReplaceReadGroups {
     }
 
     command {
-        java -jar /usr/picard/picard.jar AddOrReplaceReadGroups \
+        java -jar /usr/local/bin/picard.jar AddOrReplaceReadGroups \
             I=~{sorted_bam} \
             O=~{prefix}_DNA_sorted_rg.bam \
             RGID=1 \
             RGLB=lib_name \
             RGPL=ILLUMINA \
             RGPU=platform_unit \
-            RGSM=~{prefix} \
-            CREATE_INDEX=true
+            RGSM=~{prefix}
+        
+        if [ -f "~{prefix}_DNA_sorted_rg.bam" ]; then
+            echo "BAM file found. Proceeding to indexing."
+            samtools index -@ ~{num_threads} -o ~{prefix}_DNA_sorted_rg.bam.bai ~{prefix}_DNA_sorted_rg.bam
+        else
+            echo "Error: BAM file not found!"
+            exit 1
+        fi
     }
 
     output {
@@ -157,45 +164,13 @@ task addOrReplaceReadGroups {
     }
 
     runtime {
-        docker: 'broadinstitute/picard:3.1.1'
+        docker: 'gulhanlab/bwa_align:1.0'
         memory: "~{memory} GB"
         disks: "local-disk ~{disk_space} HDD"
         cpu: "~{num_threads}"
         preemptible: "~{num_preempt}"
     }
 }
-
-# task samtoolsIndex {
-#     input {
-#         String prefix
-#         File sorted_rg_bam
-
-#         # Configurable
-#         Float memory
-#         Int disk_space
-#         Int num_threads
-#         Int num_preempt
-#     }
-
-#     command {
-#         samtools index -@ ~{num_threads} -o ~{prefix}_DNA_sorted_rg.bam.bai ~{sorted_rg_bam}
-#     }
-
-#     #samtools index -@ ~{num_threads} ~{sorted_rg_bam}
-
-#     output {
-#         #File sorted_rg_bam_idx = '~{sorted_rg_bam}.bai'
-#         File sorted_rg_bam_idx = '~{prefix}_DNA_sorted_rg.bam.bai'
-#     }
-
-#     runtime {
-#         docker: 'staphb/samtools:1.20'
-#         memory: "~{memory} GB"
-#         disks: "local-disk ~{disk_space} HDD"
-#         cpu: "~{num_threads}"
-#         preemptible: "~{num_preempt}"
-#     }
-# }
 
 task bamQC {
     input {
