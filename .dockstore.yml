@@ -1,8 +1,17 @@
 version: 1.2
 workflows:
-  - subclass: WDL
+  - name: bwaMem_pipeline
+    subclass: WDL
+    publish: true
     primaryDescriptorPath: /bwaMem_pipeline.wdl
+    authors:
+      - name: Garrett Lam
+        email: glam@broadinstitute.org
 
+  - name: samtools_idx
+    subclass: WDL
+    publish: true
+    primaryDescriptorPath: /samtools_idx.wdl
     authors:
       - name: Garrett Lam
         email: glam@broadinstitute.org
